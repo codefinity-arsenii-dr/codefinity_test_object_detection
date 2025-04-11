@@ -2,7 +2,9 @@ import os
 
 import cv2
 import numpy as np
+import requests
 from ultralytics.engine.results import Results
+from sklearn.metrics import mean_squared_error
 
 
 def load_data(base_dir, split="train", img_size=(128, 128)):
@@ -61,7 +63,10 @@ def load_data(base_dir, split="train", img_size=(128, 128)):
 
 
 def load_dataset():
-    pass
+    train_images, train_labels, train_shapes = load_data("test_obj_det/data", split="train")
+    val_images, val_labels, val_shapes = load_data("test_obj_det/data", split="val")
+
+    return train_images, val_images, train_labels, val_labels, train_shapes, val_shapes
 
 
 def draw_bbox(img, bbox, color=(255, 255, 0), thickness=1, class_name="Object", orig_shape=None):
@@ -125,4 +130,58 @@ def draw_bbox(img, bbox, color=(255, 255, 0), thickness=1, class_name="Object", 
                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, thickness)
 
     return img
+
+
+def evaluate_custom_model(y_test, y_pred, iou_thresholds=np.arange(0.5, 1.0, 0.05)):
+    """
+    Evaluate custom object detector with metrics: MSE, mean IoU, precision, recall, and mAP.
+
+    Assumes one bounding box per image.
+
+    :param y_test: Ground truth boxes in YOLO format (N, 4)
+    :param y_pred: Predicted values of boxes
+    :param iou_thresholds: IoU thresholds for mAP computation (default: 0.5 to 0.95)
+    """
+    mse = mean_squared_error(y_test, y_pred)
+    print(f"Mean Squared Error: {mse:.4f}")
+
+    def compute_iou(box1, box2):
+        x1, y1, w1, h1 = box1
+        x2, y2, w2, h2 = box2
+
+        box1_x1, box1_y1 = x1 - w1 / 2, y1 - h1 / 2
+        box1_x2, box1_y2 = x1 + w1 / 2, y1 + h1 / 2
+        box2_x1, box2_y1 = x2 - w2 / 2, y2 - h2 / 2
+        box2_x2, box2_y2 = x2 + w2 / 2, y2 + h2 / 2
+
+        inter_x1 = max(box1_x1, box2_x1)
+        inter_y1 = max(box1_y1, box2_y1)
+        inter_x2 = min(box1_x2, box2_x2)
+        inter_y2 = min(box1_y2, box2_y2)
+
+        inter_area = max(0, inter_x2 - inter_x1) * max(0, inter_y2 - inter_y1)
+        area1 = (box1_x2 - box1_x1) * (box1_y2 - box1_y1)
+        area2 = (box2_x2 - box2_x1) * (box2_y2 - box2_y1)
+        union = area1 + area2 - inter_area
+        return inter_area / union if union > 0 else 0
+
+    # Compute IoUs
+    ious = [compute_iou(pred, true) for pred, true in zip(y_pred, y_test)]
+    mean_iou = np.mean(ious)
+    print(f"Mean IoU: {mean_iou:.4f}")
+
+    # Precision/mAP at multiple thresholds
+    precisions = []
+
+    for thresh in iou_thresholds:
+        TP = sum(iou >= thresh for iou in ious)
+        FP = sum(iou < thresh for iou in ious)
+
+        precision = TP / (TP + FP) if (TP + FP) > 0 else 0.0
+
+        precisions.append(precision)
+
+    print(f"Precision @IoU=0.50: {precisions[0]:.4f}")
+    print(f"mAP@[0.50:0.95]: {np.mean(precisions):.4f}")
+
 
