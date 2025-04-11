@@ -1,0 +1,5 @@
+train: /Users/arseniy.drobotenko/PycharmProjects/codefinity_test_object_detection/data/images/train
+val: /Users/arseniy.drobotenko/PycharmProjects/codefinity_test_object_detection/data/images/val
+
+nc: 1
+names: ['person']
