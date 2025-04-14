@@ -16,7 +16,7 @@ def solution8():
     code = """
 # === 8. Evaluate YOLOv8 model ===
 # Validate the YOLO model using the correct data.yaml file
-metrics = yolo_model.val(data="https://codefinity-content-media-v2.s3.eu-west-1.amazonaws.com/courses/ef049f7b-ce21-45be-a9f2-5103360b0655/object_detection_project/data/data.yaml")
+metrics = yolo_model.val(data="/path/to/dataset/directory/data.yaml")
 
 # Extract and print performance metrics
 precision = metrics.box.mp
