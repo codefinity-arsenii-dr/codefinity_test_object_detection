@@ -1,5 +1,4 @@
 from test_obj_det.utils import display_hint, display_solution, display_check
-from ultralytics import YOLO
 
 
 def hint8():
