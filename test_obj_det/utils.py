@@ -62,13 +62,6 @@ def load_data(base_dir, split="train", img_size=(128, 128)):
     return images, labels, original_shapes
 
 
-def load_dataset():
-    train_images, train_labels, train_shapes = load_data("test_obj_det/data", split="train")
-    val_images, val_labels, val_shapes = load_data("test_obj_det/data", split="val")
-
-    return train_images, val_images, train_labels, val_labels, train_shapes, val_shapes
-
-
 def draw_bbox(img, bbox, color=(255, 255, 0), thickness=1, class_name="Object", orig_shape=None):
     """
     Unified function to draw bounding boxes.
