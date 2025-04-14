@@ -2,9 +2,12 @@ import os
 
 import cv2
 import numpy as np
-import requests
-from ultralytics.engine.results import Results
+from IPython.display import display_markdown, display_html
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import get_lexer_by_name
 from sklearn.metrics import mean_squared_error
+from ultralytics.engine.results import Results
 
 
 def load_data(base_dir, split="train", img_size=(128, 128)):
@@ -77,15 +80,6 @@ def draw_bbox(img, bbox, color=(255, 255, 0), thickness=1, class_name="Object", 
     :param orig_shape: Resize back to original shape if provided.
     :return: Image with bounding box(es) drawn.
     """
-    # Resize image back to original if shape provided
-    if orig_shape:
-        img = cv2.resize(img, (orig_shape[1], orig_shape[0]))
-        height, width = orig_shape
-    else:
-        height, width = img.shape[:2]
-
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
     # Check if YOLOv8 Results list
     if isinstance(bbox, list) and all(isinstance(b, Results) for b in bbox):
         for b in bbox:
@@ -100,7 +94,25 @@ def draw_bbox(img, bbox, color=(255, 255, 0), thickness=1, class_name="Object", 
                 img = cv2.rectangle(img, (x1, y1), (x2, y2), color, thickness)
                 img = cv2.putText(img, label, (x1, max(10, y1 - 10)),
                                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, thickness)
-        return img
+
+                # Resize image back to original if shape provided
+                if orig_shape:
+                    img = cv2.resize(img, (orig_shape[1], orig_shape[0]))
+                    height, width = orig_shape
+                else:
+                    height, width = img.shape[:2]
+
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                return img
+
+    # Resize image back to original if shape provided
+    if orig_shape:
+        img = cv2.resize(img, (orig_shape[1], orig_shape[0]))
+        height, width = orig_shape
+    else:
+        height, width = img.shape[:2]
+
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
     # Otherwise assume [x, y, w, h] format (custom model)
     bbox = np.array(bbox).flatten()
@@ -177,4 +189,21 @@ def evaluate_custom_model(y_test, y_pred, iou_thresholds=np.arange(0.5, 1.0, 0.0
     print(f"Precision @IoU=0.50: {precisions[0]:.4f}")
     print(f"mAP@[0.50:0.95]: {np.mean(precisions):.4f}")
 
+
+def display_hint(text: str):
+    display_markdown(text, raw=True)
+
+
+def display_solution(code: str):
+    lexer = get_lexer_by_name("python", stripall=True)
+    formatter = HtmlFormatter(style="monokai")
+    style = f"""<style>{formatter.get_style_defs(".output_html")}</style>"""
+    display_html(style + highlight(code, lexer, formatter), raw=True)
+
+
+def display_check(correct: bool, text: str):
+    display_html(
+        f"""<span style="color: {"green" if correct else "red"}">{text}</span>""",
+        raw=True,
+    )
 
