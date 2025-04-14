@@ -6,7 +6,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'ultralytics',
-        'sklearn',
+        'scikit-learn',
         'pygments',
         'IPython',
         'numpy',
