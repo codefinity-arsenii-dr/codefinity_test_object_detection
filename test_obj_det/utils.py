@@ -59,7 +59,7 @@ def load_data(base_dir, split="train", img_size=(128, 128)):
             label_data = list(map(float, line.strip().split()))
             labels.append(label_data[1:5])  # Exclude class_id
 
-    images = np.array(images, dtype=np.float32) / 255.0
+    images = np.array(images, dtype=np.float32)
     labels = np.array(labels, dtype=np.float32)
 
     return images, labels, original_shapes
