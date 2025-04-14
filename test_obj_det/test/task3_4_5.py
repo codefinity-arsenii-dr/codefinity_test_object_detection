@@ -119,8 +119,8 @@ def check345(model, weights_path):
             return
 
         # Check if model is trained or weights loaded
-        if os.path.exists(weights_path):
-            display_check(True, "Great job! Weights were loaded. Next key: 7XPB9R")
+        if not os.path.exists(weights_path):
+            display_check(False, "Weights weren't loaded. Did you call `save_weights()`?")
             return
 
         history = getattr(model, 'history', None)
