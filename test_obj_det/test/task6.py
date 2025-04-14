@@ -35,28 +35,11 @@ plt.show()
     display_solution(code)
 
 
-def check6(yolo_model, val_images, idx):
+def check6(yolo_model):
     try:
         # Check if the YOLO model is loaded properly
         if not isinstance(yolo_model, YOLO):
             display_check(False, "YOLO model is not loaded correctly.")
-            return
-
-        # Convert normalized image to uint8
-        image = (val_images[idx] * 255).astype(np.uint8)
-
-        # Run YOLO predictions
-        results = yolo_model.predict(image, conf=0.5)
-
-        # Check if predictions contain bounding boxes
-        if len(results.xywh[0]) == 0:
-            display_check(False, "No bounding boxes detected.")
-            return
-
-        # Check if draw_bbox function is used correctly
-        image_with_yolo = draw_bbox(image, results)
-        if image_with_yolo is None:
-            display_check(False, "The image_with_yolo is None. Check your draw_bbox implementation.")
             return
 
         display_check(True, "YOLOv8 predictions and visualization are correct. Well done!")

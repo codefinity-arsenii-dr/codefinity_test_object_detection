@@ -33,23 +33,20 @@ print(f"mAP50-95: {map:.4f}")
     display_solution(code)
 
 
-def check8(yolo_model):
+def check8(metrics):
     try:
-        # Check if the YOLO model is loaded and ready
-        if not yolo_model:
-            display_check(False, "YOLOv8 model is not loaded properly.")
-            return
+        # Extract required metrics
+        precision = metrics.box.mp
+        recall = metrics.box.mr
+        map50 = metrics.box.map50
+        map = metrics.box.map
 
-        # Evaluate the model using the provided data.yaml file
-        metrics = yolo_model.val(
-            data="https://codefinity-content-media-v2.s3.eu-west-1.amazonaws.com/courses/ef049f7b-ce21-45be-a9f2-5103360b0655/object_detection_project/data/data.yaml")
-
-        # Check if metrics are returned
-        if not metrics:
-            display_check(False, "No metrics returned from the evaluation.")
-            return
-
-        display_check(True, "YOLO model evaluated successfully.")
+        # Check if all metrics are present and are floats
+        if all(isinstance(m, float) for m in [precision, recall, map50, map]):
+            display_check(True, "YOLO metrics extracted successfully.")
+        else:
+            display_check(False, "One or more metrics are missing or invalid.")
 
     except Exception as e:
         display_check(False, f"Something went wrong: {str(e)}")
+
