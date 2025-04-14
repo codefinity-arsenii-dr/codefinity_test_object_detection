@@ -114,7 +114,7 @@ def check345(model, weights_path):
                     return
 
         # Check if model is compiled
-        if not model._is_compiled:
+        if model.optimizer is None:
             display_check(False, "Model is not compiled. Did you call `compile()`?")
             return
 

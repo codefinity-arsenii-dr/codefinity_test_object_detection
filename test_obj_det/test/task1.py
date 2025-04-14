@@ -10,8 +10,8 @@ images, labels, shapes = load_data(...)
 
 def solution1():
     code = """
-train_images, train_labels, train_shapes = load_data("/content/drive/MyDrive/CV/data", split="train")
-val_images, val_labels, val_shapes = load_data("/content/drive/MyDrive/CV/data", split="val")
+train_images, train_labels, train_shapes = load_data("/path/to/dataset/data", split="train")
+val_images, val_labels, val_shapes = load_data("/path/to/dataset/data", split="val")
 """
     display_solution(code)
 
