@@ -72,69 +72,51 @@ def draw_bbox(img, bbox, color=(255, 255, 0), thickness=1, class_name="Object", 
       - Custom model: bbox as [x, y, w, h]
       - YOLOv8: bbox as list of `Results` objects
 
-    :param img: Image (NumPy array).
+    :param img: Image (NumPy array), the **resized** image used for prediction.
     :param bbox: Bounding box array or list of YOLOv8 Results.
     :param color: Color of the box.
     :param thickness: Thickness of rectangle.
     :param class_name: Label for custom model.
-    :param orig_shape: Resize back to original shape if provided.
+    :param orig_shape: Original image shape (H, W) before resizing.
     :return: Image with bounding box(es) drawn.
     """
     # Check if YOLOv8 Results list
     if isinstance(bbox, list) and all(isinstance(b, Results) for b in bbox):
+        height, width = img.shape[:2]
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
         for b in bbox:
             for i in range(len(b.boxes)):
-                box = b.boxes.xyxy[i].cpu().numpy().astype(int)
+                box = b.boxes.xyxy[i].cpu().numpy()
                 x1, y1, x2, y2 = box
+
+                # If we want to scale back to original image size
+                if orig_shape is not None:
+                    orig_h, orig_w = orig_shape
+                    scale_x = orig_w / width
+                    scale_y = orig_h / height
+
+                    x1 *= scale_x
+                    x2 *= scale_x
+                    y1 *= scale_y
+                    y2 *= scale_y
+
+                    # Resize the image back to original size
+                    img = cv2.resize(img, (orig_w, orig_h))
 
                 conf = float(b.boxes.conf[i])
                 cls_id = int(b.boxes.cls[i])
                 label = f"{b.names[cls_id]} {conf:.2f}"
 
-                img = cv2.rectangle(img, (x1, y1), (x2, y2), color, thickness)
-                img = cv2.putText(img, label, (x1, max(10, y1 - 10)),
+                img = cv2.rectangle(img,
+                                    (int(x1), int(y1)),
+                                    (int(x2), int(y2)),
+                                    color, thickness)
+                img = cv2.putText(img, label, (int(x1), max(10, int(y1) - 10)),
                                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, thickness)
 
-                # Resize image back to original if shape provided
-                if orig_shape:
-                    img = cv2.resize(img, (orig_shape[1], orig_shape[0]))
-                    height, width = orig_shape
-                else:
-                    height, width = img.shape[:2]
+        return img
 
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                return img
-
-    # Resize image back to original if shape provided
-    if orig_shape:
-        img = cv2.resize(img, (orig_shape[1], orig_shape[0]))
-        height, width = orig_shape
-    else:
-        height, width = img.shape[:2]
-
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-    # Otherwise assume [x, y, w, h] format (custom model)
-    bbox = np.array(bbox).flatten()
-    x, y, w, h = bbox
-    x = x * width
-    y = y * height
-    w = w * width
-    h = h * height
-
-    x1 = int(x - w / 2)
-    y1 = int(y - h / 2)
-    x2 = int(x + w / 2)
-    y2 = int(y + h / 2)
-
-    x1, y1 = max(0, x1), max(0, y1)
-    x2, y2 = min(width - 1, x2), min(height - 1, y2)
-
-    img = cv2.rectangle(img, (x1, y1), (x2, y2), color, thickness)
-    img = cv2.putText(img, class_name, (x1, max(10, y1 - 10)),
-                      cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, thickness)
-
-    return img
 
 
 def evaluate_custom_model(y_test, y_pred, iou_thresholds=np.arange(0.5, 1.0, 0.05)):
