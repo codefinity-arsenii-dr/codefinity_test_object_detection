@@ -80,11 +80,12 @@ def draw_bbox(img, bbox, color=(255, 255, 0), thickness=1, class_name="Object", 
     :param orig_shape: Original image shape (H, W) before resizing.
     :return: Image with bounding box(es) drawn.
     """
+
+    height, width = img.shape[:2]
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
     # Check if YOLOv8 Results list
     if isinstance(bbox, list) and all(isinstance(b, Results) for b in bbox):
-        height, width = img.shape[:2]
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
         for b in bbox:
             for i in range(len(b.boxes)):
                 box = b.boxes.xyxy[i].cpu().numpy()
@@ -117,6 +118,27 @@ def draw_bbox(img, bbox, color=(255, 255, 0), thickness=1, class_name="Object", 
 
         return img
 
+    # Otherwise assume [x, y, w, h] format (custom model)
+    bbox = np.array(bbox).flatten()
+    x, y, w, h = bbox
+    x = x * width
+    y = y * height
+    w = w * width
+    h = h * height
+
+    x1 = int(x - w / 2)
+    y1 = int(y - h / 2)
+    x2 = int(x + w / 2)
+    y2 = int(y + h / 2)
+
+    x1, y1 = max(0, x1), max(0, y1)
+    x2, y2 = min(width - 1, x2), min(height - 1, y2)
+
+    img = cv2.rectangle(img, (x1, y1), (x2, y2), color, thickness)
+    img = cv2.putText(img, class_name, (x1, max(10, y1 - 10)),
+                      cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, thickness)
+
+    return img
 
 
 def evaluate_custom_model(y_test, y_pred, iou_thresholds=np.arange(0.5, 1.0, 0.05)):
