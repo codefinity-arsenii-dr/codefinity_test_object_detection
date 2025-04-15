@@ -15,7 +15,7 @@ def solution7():
     code = """
 # === 7. Predict on validation set and evaluate ===
 # Generate predictions from the custom model
-pred_labels = model.predict(val_images)
+pred_labels = model.predict(val_images_norm)
 
 # Evaluate the model
 evaluate_custom_model(val_labels, pred_labels)
@@ -35,7 +35,7 @@ def check7(model, val_images, val_labels):
             display_check(False, "No predictions generated. Ensure the model is working.")
             return
 
-        display_check(True, "Predictions generated and evaluation completed correctly.")
+        display_check(True, "Predictions generated and evaluation completed correctly. Next key: B55GT3")
 
     except Exception as e:
         display_check(False, f"Something went wrong: {str(e)}")

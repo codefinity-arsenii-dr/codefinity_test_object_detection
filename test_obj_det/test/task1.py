@@ -27,4 +27,4 @@ def check1(train_images, train_labels, train_shapes, val_images, val_labels, val
     elif len(train_shapes) != train_images.shape[0] or len(val_shapes) != val_images.shape[0]:
         display_check(False, "Original shape count doesn't match number of images.")
     else:
-        display_check(True, "Well done! Here's your next key part: LDA92P")
+        display_check(True, "Well done! Here's your first key part: LDA92P")

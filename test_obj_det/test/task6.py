@@ -33,7 +33,7 @@ def check6(yolo_model):
             display_check(False, "YOLO model is not loaded correctly.")
             return
 
-        display_check(True, "YOLOv8 predictions and visualization are correct. Well done!")
+        display_check(True, "YOLOv8 predictions and visualization are correct. Next key: LDB67X")
 
     except Exception as e:
         display_check(False, f"Something went wrong: {str(e)}")

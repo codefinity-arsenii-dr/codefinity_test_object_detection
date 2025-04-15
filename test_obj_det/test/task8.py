@@ -43,7 +43,7 @@ def check8(metrics):
 
         # Check if all metrics are present and are floats
         if all(isinstance(m, float) for m in [precision, recall, map50, map]):
-            display_check(True, "YOLO metrics extracted successfully.")
+            display_check(True, "YOLO metrics extracted successfully. Here's your next key part: A777CS")
         else:
             display_check(False, "One or more metrics are missing or invalid.")
 
