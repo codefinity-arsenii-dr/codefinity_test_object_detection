@@ -13,11 +13,7 @@ Step 7:
 
 def solution7():
     code = """
-# === 7. Predict on validation set and evaluate ===
-# Generate predictions from the custom model
 pred_labels = model.predict(val_images_norm)
-
-# Evaluate the model
 evaluate_custom_model(val_labels, pred_labels)
 """
     display_solution(code)

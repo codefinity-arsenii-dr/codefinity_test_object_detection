@@ -70,9 +70,9 @@ def solution5():
 model = build_load_model(
     X_train=train_images_norm,
     y_train=train_labels,
-    weights_path="model_weights.h5",
-    optimizer=keras.optimizers.Adam(),
-    loss=keras.losses.MeanSquaredError(),
+    weights_path="/path/to/weights/custom_object_detector.weights.h5",
+    optimizer='adam',
+    loss='mse',
     metrics=["mae"]
 )
 """

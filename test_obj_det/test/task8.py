@@ -14,11 +14,8 @@ Step 8:
 
 def solution8():
     code = """
-# === 8. Evaluate YOLOv8 model ===
-# Validate the YOLO model using the correct data.yaml file
 metrics = yolo_model.val(data="/path/to/dataset/directory/data.yaml")
 
-# Extract and print performance metrics
 precision = metrics.box.mp
 recall = metrics.box.mr
 map50 = metrics.box.map50

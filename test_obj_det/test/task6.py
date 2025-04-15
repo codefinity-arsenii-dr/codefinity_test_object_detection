@@ -14,13 +14,7 @@ Step 6:
 
 def solution6():
     code = """
-# === 6. Use YOLOv8 to run predictions ===
-# TODO: Load a pretrained YOLOv8 model and perform inference
-
-# Link to fine-tuned model: https://codefinity-content-media-v2.s3.eu-west-1.amazonaws.com/courses/ef049f7b-ce21-45be-a9f2-5103360b0655/object_detection_project/models/yolo_trained.pt
 yolo_model = YOLO('https://codefinity-content-media-v2.s3.eu-west-1.amazonaws.com/courses/ef049f7b-ce21-45be-a9f2-5103360b0655/object_detection_project/models/yolo_trained.pt')
-
-# Run YOLOv8 prediction
 yolo_results = yolo_model.predict([img for img in val_images[:9]], conf=0.3)
 """
     display_solution(code)
