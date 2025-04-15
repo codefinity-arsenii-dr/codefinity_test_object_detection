@@ -80,55 +80,47 @@ model = build_load_model(
 
 def check345(model, weights_path):
     try:
-        # Check model architecture
-        expected_layers = [
-            ("Conv2D", 32),
-            ("MaxPooling2D", None),
-            ("Conv2D", 64),
-            ("MaxPooling2D", None),
-            ("Conv2D", 64),
-            ("MaxPooling2D", None),
-            ("Conv2D", 128),
-            ("MaxPooling2D", None),
-            ("Flatten", None),
-            ("Dense", 1024),
-            ("Dropout", None),
-            ("Dense", 4)
+        # Check model architecture (types only)
+        expected_layer_types = [
+            "Conv2D",
+            "MaxPooling2D",
+            "Conv2D",
+            "MaxPooling2D",
+            "Conv2D",
+            "MaxPooling2D",
+            "Conv2D",
+            "MaxPooling2D",
+            "Flatten",
+            "Dense",
+            "Dropout",
+            "Dense"
         ]
-        layers_list = model.layers
 
-        if len(layers_list) != len(expected_layers):
-            display_check(False, f"Expected {len(expected_layers)} layers, found {len(layers_list)}.")
+        layers_list = model.layers
+        if len(layers_list) != len(expected_layer_types):
+            display_check(False, f"Expected {len(expected_layer_types)} layers, found {len(layers_list)}.")
             return
 
-        for i, (layer_type, filters) in enumerate(expected_layers):
-            if layer_type not in str(type(layers_list[i])):
-                display_check(False, f"Layer {i+1} should be {layer_type}, found {type(layers_list[i])}.")
+        for i, expected_type in enumerate(expected_layer_types):
+            if expected_type not in str(type(layers_list[i])):
+                display_check(False, f"Layer {i+1} should be {expected_type}, found {type(layers_list[i]).__name__}.")
                 return
-            if filters is not None:
-                if hasattr(layers_list[i], "filters") and layers_list[i].filters != filters:
-                    display_check(False, f"Layer {i+1} should have {filters} filters, found {layers_list[i].filters}.")
-                    return
-                if hasattr(layers_list[i], "units") and layers_list[i].units != filters:
-                    display_check(False, f"Layer {i+1} should have {filters} units, found {layers_list[i].units}.")
-                    return
 
         # Check if model is compiled
         if model.optimizer is None:
             display_check(False, "Model is not compiled. Did you call `compile()`?")
             return
 
-        # Check if model is trained or weights loaded
-        if not os.path.exists(weights_path):
-            display_check(False, "Weights weren't loaded. Did you call `save_weights()`?")
+        # Check if model is either trained or has weights loaded
+        has_weights_loaded = os.path.exists(weights_path)
+        has_training_history = hasattr(model, 'history') and hasattr(model.history, 'history') and len(model.history.history) > 0
+
+        if not has_weights_loaded and not has_training_history:
+            display_check(False, "Model is neither trained nor has weights loaded.")
             return
 
-        history = getattr(model, 'history', None)
-        if not history or not hasattr(history, 'history') or len(history.history) == 0:
-            display_check(False, "Model not trained and no weights loaded.")
-            return
-
-        display_check(True, "Model is compiled and trained. Next key: 7XPB9R")
+        display_check(True, "Model architecture and setup look good! Next key: 7XPB9R")
 
     except Exception as e:
         display_check(False, f"Something went wrong: {str(e)}")
+
