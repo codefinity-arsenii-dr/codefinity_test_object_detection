@@ -100,24 +100,28 @@ def check345(model, weights_path):
         if len(layers_list) != len(expected_layer_types):
             display_check(False, f"Expected {len(expected_layer_types)} layers, found {len(layers_list)}.")
             return
+        print('layer list len: pass')
 
         for i, expected_type in enumerate(expected_layer_types):
             if expected_type not in str(type(layers_list[i])):
                 display_check(False, f"Layer {i+1} should be {expected_type}, found {type(layers_list[i]).__name__}.")
                 return
+        print('layer types len: pass')
 
         # Check if model is compiled
         if model.optimizer is None:
             display_check(False, "Model is not compiled. Did you call `compile()`?")
             return
+        print('compiled: pass')
 
         # Check if model is either trained or has weights loaded
         has_weights_loaded = os.path.exists(weights_path)
         has_training_history = hasattr(model, 'history') and hasattr(model.history, 'history') and len(model.history.history) > 0
-
+        print(f'has_weights_loaded - {has_weights_loaded}, has_training_history - {has_training_history}')
         if not has_weights_loaded and not has_training_history:
             display_check(False, "Model is neither trained nor has weights loaded.")
             return
+        print(f'has_weights_loaded and has_training_history: pass')
 
         display_check(True, "Model architecture and setup look good! Next key: 7XPB9R")
 
