@@ -119,7 +119,7 @@ def check345(model, weights_path):
             display_check(False, "Model is neither trained nor has weights loaded.")
             return
 
-        display_check(True, "Model architecture and setup look good! Next key: 7XPB9R")
+        display_check(True, "Model architecture and setup look good! Next keys: 7XPB9R, TT66X5, JIO907")
 
     except Exception as e:
         display_check(False, f"Something went wrong: {str(e)}")
